@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Books = ({ result, show}) => {
+const Books = ({ result, show }) => {
   if (!show) {
     return null
   }

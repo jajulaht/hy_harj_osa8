@@ -11,7 +11,9 @@ const AuthorForm = (props) => {
       variables: { name, setBornTo }
     })
 
-    document.getElementById("selectAuthor").selectedIndex = 0
+    document
+      .getElementById("selectAuthor")
+      .selectedIndex = 0
     setName(props.result.data.allAuthors[0].name)
     setSetBornTo('')
   }

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
+import AuthorForm from './AuthorForm'
 //import { useApolloClient } from '@apollo/react-hooks'
 
 const Authors = (props) => {
-  const [name, setName] = useState('')
-  const [setBornTo, setSetBornTo] = useState('')
 
   if (!props.show) {
     return null
@@ -11,16 +10,6 @@ const Authors = (props) => {
 
   if (props.result.loading) {
     return <div>loading...</div>
-  }
-
-  const submit = async (e) => {
-    e.preventDefault()
-    await props.editAuthor({
-      variables: { name, setBornTo }
-    })
-
-    setName('')
-    setSetBornTo('')
   }
 
   return (
@@ -46,24 +35,7 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
-        <h3>Set birthyear</h3>
-        <form onSubmit={submit}>
-        <div>
-          name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
-        </div>
-        <div>
-          born
-          <input
-            value={setBornTo}
-            onChange={({ target }) => setSetBornTo(parseInt(target.value))}
-          />
-        </div>
-        <button type='submit'>Update author</button>
-      </form>
+      <AuthorForm result={props.result} editAuthor={props.editAuthor} />
     </div>
   )
 }

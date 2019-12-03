@@ -1,5 +1,8 @@
 const { ApolloServer, gql } = require('apollo-server')
 const uuid = require('uuid/v1')
+const mongoose = require('mongoose')
+
+mongoose.set('useFindAndModify', false)
 
 let authors = [
   {
@@ -89,7 +92,7 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: String!
-    author: String!
+    author: Author!
     id: ID!
     genres: [String]
   }
@@ -111,7 +114,7 @@ const typeDefs = gql`
   type Mutation {
     addBook(
       title: String!
-      author: String
+      author: String!
       published: Int!
       genres: [String!]
     ): Book
@@ -151,6 +154,13 @@ const resolvers = {
   Author: {
     bookCount: (root) => books.filter(b => b.author === root.name).length
   },
+  Book: {
+    author: (root) => {
+      return {
+        name: root.name
+      }
+    }
+  },
   Mutation: {
     addBook: (root, args) => {
       console.log('author', args.author)
@@ -158,7 +168,15 @@ const resolvers = {
         const author = { name: args.author, id: uuid() }
         authors = authors.concat(author)
       }
-      const book = { ...args, id: uuid() }
+      const bookAuthor = authors.find(a => a.name === args.author)
+      const authorObj = { 
+        name: bookAuthor.name,
+        id: bookAuthor.id,
+        born: bookAuthor.born
+      }
+      console.log('authorObj', authorObj)
+      const book = { ...args, author: authorObj, id: uuid() }
+      console.log('book', book)
       books = books.concat(book)
       return book
     },

@@ -37,20 +37,28 @@ let authors = [
 */
 
 let books = [
-  // {
-  //   title: 'Clean Code',
-  //   published: 2008,
-  //   author: 'Robert Martin',
-  //   id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
-  //   genres: ['refactoring']
-  // },
-  // {
-  //   title: 'Agile software development',
-  //   published: 2002,
-  //   author: 'Robert Martin',
-  //   id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
-  //   genres: ['agile', 'patterns', 'design']
-  // },
+  {
+    title: 'Clean Code',
+    published: 2008,
+    author: {
+      name: 'Robert Martin',
+      id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
+      born: 1952
+    },
+    id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
+    genres: ['refactoring']
+  },
+  {
+    title: 'Agile software development',
+    published: 2002,
+    author: {
+      name: 'Robert Martin',
+      id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
+      born: 1963
+    },
+    id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
+    genres: ['agile', 'patterns', 'design']
+  },
   // {
   //   title: 'Refactoring, edition 2',
   //   published: 2018,
@@ -104,12 +112,6 @@ const typeDefs = gql`
     bookCount: Int!
   }
 
-  input AuthorInput {
-    name: String!
-    id: ID
-    born: String
-  }
-
   type Query {
     bookCount: Int!
     authorCount: Int!
@@ -120,7 +122,7 @@ const typeDefs = gql`
   type Mutation {
     addBook(
       title: String!
-      author: AuthorInput!
+      author: String!
       published: Int!
       genres: [String!]
     ): Book
@@ -160,13 +162,6 @@ const resolvers = {
   Author: {
     bookCount: (root) => books.filter(b => b.author === root.name).length
   },
-  // Book: {
-  //   author: (root) => {
-  //     return {
-  //       name: root.name
-  //     }
-  //   }
-  // },
   Mutation: {
     addBook: (root, args) => {
       console.log('author', args.author)

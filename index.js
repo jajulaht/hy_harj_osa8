@@ -53,19 +53,23 @@ let books = [
     published: 2002,
     author: {
       name: 'Robert Martin',
-      id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
+      id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
       born: 1963
     },
     id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
     genres: ['agile', 'patterns', 'design']
   },
-  // {
-  //   title: 'Refactoring, edition 2',
-  //   published: 2018,
-  //   author: 'Martin Fowler',
-  //   id: "afa5de00-344d-11e9-a414-719c6709cf3e",
-  //   genres: ['refactoring']
-  // },
+  {
+    title: 'Refactoring, edition 2',
+    published: 2018,
+    author: {
+      name: 'Martin Fowler',
+      id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
+      born: 1963
+    },
+    id: "afa5de00-344d-11e9-a414-719c6709cf3e",
+    genres: ['refactoring']
+  },
   // {
   //   title: 'Refactoring to patterns',
   //   published: 2008,
@@ -146,7 +150,7 @@ const resolvers = {
         return books
       }
       else if (args.author && !args.genre) {
-        return books.filter(b => b.author === args.author)
+        return books.filter(b => b.author.name === args.author)
       }
       else if (!args.author && args.genre) {
         return books.filter(b => b.genres.includes(args.genre))
@@ -160,7 +164,7 @@ const resolvers = {
     allAuthors: () => authors,
   },
   Author: {
-    bookCount: (root) => books.filter(b => b.author === root.name).length
+    bookCount: (root) => books.filter(b => b.author.name === root.name).length
   },
   Mutation: {
     addBook: (root, args) => {

@@ -169,11 +169,16 @@ const resolvers = {
   Mutation: {
     addBook: (root, args) => {
       console.log('author', args.author)
-      if (authors.find(a => a.name !== args.author)) {
+      if (!authors.some(a => a.name === args.author)) {
+        console.log('nimet', authors)
+        console.log('nimi ei löydy', authors.some(a => a.name === args.author))
+        console.log('nimi ei muka löydy', authors.some(a => a.name !== args.author))
         const author = { name: args.author, id: uuid() }
         authors = authors.concat(author)
+        console.log('nimi lisätty', authors)
       }
       const bookAuthor = authors.find(a => a.name === args.author)
+      console.log('bookAuthor', bookAuthor)
       const authorObj = { 
         name: bookAuthor.name,
         id: bookAuthor.id,

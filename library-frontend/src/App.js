@@ -20,14 +20,18 @@ const ALL_BOOKS = gql`
   {
     allBooks  {
       title
-      author
+      author {
+        name
+        born
+        id
+      }
       published
     }
   }
 `
 
 const CREATE_BOOK = gql`
-mutation createBook($title: String!, $author: String, $published: Int!, $genres: [String!]) {
+mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]) {
   addBook(
     title: $title,
     author: $author,
@@ -35,7 +39,11 @@ mutation createBook($title: String!, $author: String, $published: Int!, $genres:
     genres: $genres
   ) {
     title
-    author
+    author {
+      name
+      born
+      id
+    }
     published
     genres
   }
@@ -89,6 +97,7 @@ const App = () => {
 
       <NewBook
         addBook={addBook}
+        setPage={setPage}
         show={page === 'add'}
       />
 

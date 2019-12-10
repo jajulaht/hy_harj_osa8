@@ -161,7 +161,6 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      console.log('args', args)
       if (!args.author && !args.genre) {
         return await Book.find({}).populate("author")
       }
@@ -172,7 +171,6 @@ const resolvers = {
         const resp = await Book
           .find({ genres: { $in: [args.genre] }})
           .populate("author")
-        console.log('haku', resp)
         return resp // includes?
       }
       else {
@@ -183,17 +181,13 @@ const resolvers = {
   },
   Author: {
     bookCount: async root => {
-      console.log('root', root)
       const searchedAuthor = await Author.findOne({ name: root.name })
-      console.log('searchedAuthor', searchedAuthor)
       const countedBooks = await Book.collection.countDocuments({ author: searchedAuthor._id })
-      console.log('count', countedBooks)
       return countedBooks
     }
   },
   Mutation: {
     addBook: async (root, args) => {
-      console.log('args', args)
       let author = await Author.findOne({ name: args.author })
       if (!author) {
         author = new Author({ name: args.author, born: args.born })
@@ -205,12 +199,7 @@ const resolvers = {
           })
         }
       }
-      const book = new Book({
-        title: args.title,
-        published: args.published,
-        genres: args.genres,
-        author: author._id
-      })
+      const book = new Book({ ...args, author: author._id})
       try {
         await book.save();
       } catch (error) {
@@ -219,7 +208,6 @@ const resolvers = {
         })
       }
       const authorObj = await Author.findOne({ _id: book.author })
-      console.log('authorObj', authorObj)
       const returnedBook = {
         title: book.title,
         published: book.published,
@@ -227,12 +215,18 @@ const resolvers = {
         author: authorObj,
         id: book._id
       }
-      console.log('returnedBook', returnedBook)
       return returnedBook
     },
-    addAuthor: (root, args) => {
+    addAuthor: async (root, args) => {
       const author = new Author({ ...args })
-      return author.save()
+      try {
+        await author.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+      return author
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name })
@@ -240,7 +234,14 @@ const resolvers = {
         return null
       }
       author.born = args.setBornTo
-      return author.save()
+      try {
+        await author.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+      return author
     } 
   }
 }

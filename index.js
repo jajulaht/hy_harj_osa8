@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { ApolloServer, gql, UserInputError } = require('apollo-server')
+const { ApolloServer, gql, UserInputError, AuthenticationError } = require('apollo-server')
 const uuid = require('uuid/v1')
 const mongoose = require('mongoose')
 const Author = require('./models/author')
@@ -117,7 +117,7 @@ const resolvers = {
     }
   },
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, context) => {
       let author = await Author.findOne({ name: args.author })
       const currentUser = context.currentUser
       if (!author && args.title.length > 2) {
@@ -165,7 +165,7 @@ const resolvers = {
       }
       return author
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
       const author = await Author.findOne({ name: args.name })
       if (!author) {
         return null
@@ -216,7 +216,7 @@ const server = new ApolloServer({
       const decodedToken = jwt.verify(
         auth.substring(7), JWT_SECRET
       )
-      const currentUser = await User.findById(decodedToken.id).populate('favoriteGenre')
+      const currentUser = await User.findById(decodedToken.id)
       return { currentUser }
     }
   }

@@ -5,6 +5,7 @@ import NewBook from './components/NewBook'
 import { gql } from 'apollo-boost'
 import { useQuery, useMutation, useApolloClient } from '@apollo/react-hooks'
 import LoginForm from './components/LoginForm'
+import Recommended from './components/Recommended'
 
 const ALL_AUTHORS = gql`
   {
@@ -69,11 +70,20 @@ const LOGIN = gql`
   }
 `
 
+const MY_GENRE = gql`
+  {
+    me {
+      favoriteGenre
+    }
+  }
+`
+
 const App = () => {
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
   const authors = useQuery(ALL_AUTHORS)
   const books = useQuery(ALL_BOOKS)
+  const myGenre = useQuery(MY_GENRE)
   const [token, setToken] = useState(null)
   const client = useApolloClient()
 
@@ -128,6 +138,7 @@ const App = () => {
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         <button onClick={() => setPage('add')}>add book</button>
+        <button onClick={() => setPage('recommended')}>recommended</button>
         <button onClick={logout}>logout</button>
       </div>
       {errorMessage &&
@@ -153,6 +164,11 @@ const App = () => {
         show={page === 'add'}
       />
 
+      <Recommended
+        genreResult={myGenre}
+        result={books}
+        show={page === 'recommended'}
+      />
     </div>
   )
 }

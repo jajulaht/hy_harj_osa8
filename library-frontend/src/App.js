@@ -3,7 +3,7 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import { gql } from 'apollo-boost'
-import { useQuery, useMutation, useApolloClient } from '@apollo/react-hooks'
+import { useQuery, useMutation, useApolloClient, useSubscription } from '@apollo/react-hooks'
 import LoginForm from './components/LoginForm'
 import Recommended from './components/Recommended'
 
@@ -18,19 +18,26 @@ const ALL_AUTHORS = gql`
   }
 `
 
+const BOOK_DETAILS = gql`
+fragment BookDetails on Book {
+  title
+  author {
+    name
+    born
+    id
+  }
+  published
+  genres
+}
+`
+
 const ALL_BOOKS = gql`
   {
     allBooks  {
-      title
-      author {
-        name
-        born
-        id
-      }
-      published
-      genres
+      ...BookDetails
     }
   }
+${BOOK_DETAILS}
 `
 
 const CREATE_BOOK = gql`
@@ -78,6 +85,15 @@ const MY_GENRE = gql`
   }
 `
 
+const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+${BOOK_DETAILS}
+`
+
 const App = () => {
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
@@ -113,11 +129,16 @@ const App = () => {
     localStorage.clear()
     client.resetStore()
   }
-
   const errorNotification = () => errorMessage &&
   <div style={{ color: 'red' }}>
     {errorMessage}
   </div>
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      let bookTitle = subscriptionData.data.bookAdded.title
+      window.alert(`${bookTitle} added`)
+    }
+  })
 
   if (!token) {
     return (
